@@ -60,21 +60,56 @@ python -m pytest -q tests
 ## 🏗️ Architecture
 
 ```
-User Question
-     │
-     ▼
+USER
+  │
+  ▼
+PDF UPLOAD
+  │
+  ▼
+DOCUMENT TOOL LAYER (Zero Raw-Text Pre-Extraction)
+  ├── PDF source / reference (raw bytes for on-demand loading)
+  ├── Document metadata (doc_id, title, page count)
+  ├── Heading metadata (title + page number only)
+  └── Keyword → page-number lookup (page numbers only, lazily populated)
+  │
+  ▼
+AI AGENT
+  │
+  ▼
 INTAKE (LLM) ──► Slots (1-3 atomic facts)
-     │
-     ▼
-INQUEST LOOP (max 6 tool calls)
-  build_moves() → gate() → Desk.call() → reader.read() → verify()
-     │
-     ▼
-VERDICT (deterministic code)
-     │
-     ▼
-WRITER (LLM narrates from verdict JSON only)
+  │
+  ▼
+SOLVENCY GATE (remaining_calls ≥ closure_cost invariant)
+  │
+  ▼
+ONE OF FOUR ALLOWED TOOLS (Desk-metered, max 6 calls per question)
+  ├── list_documents()
+  ├── list_headings()
+  ├── search_keyword()
+  └── get_page()
+         │
+         ▼ (requested content only)
+       READER (Sealed extractor LLM)
+         │
+         ▼
+     VERIFICATION (Code-side proof & quarantine)
+         │
+         ▼
+       DOCKET (Structured state & succession chains)
+         │
+         ▼
+    DETERMINISTIC VERDICT ENGINE
+         │
+         ▼
+       WRITER (LLM narrates from verdict JSON only)
+         │
+         ▼
+       ANSWER
 ```
+
+### Zero Raw-Text Pre-Extraction Guarantee
+
+> **At upload time, Solvent Inquest stores the PDF source and lightweight metadata needed by the document tools. It does not preload or cache raw page text.** Document content is accessed only when the agent invokes one of the four allowed document tools. `search_keyword()` returns only page numbers, `list_headings()` returns only heading metadata, and `get_page()` extracts only the requested page. Raw page text is not cached at upload time.
 
 ### The Solvency Invariant
 

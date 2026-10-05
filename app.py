@@ -93,7 +93,7 @@ with st.sidebar:
     if up is not None:
         sig = (up.name, up.size)
         if st.session_state.sig != sig:
-            with st.spinner("Preparing the tool interface (indexing pages for the four tools)..."):
+            with st.spinner("Registering document metadata for tool interface..."):
                 tools = DocumentTools()
                 st.session_state.doc_id = tools.add_pdf(up.getvalue(), title=up.name)
                 st.session_state.tools, st.session_state.sig, st.session_state.messages = tools, sig, []
