@@ -1,0 +1,6 @@
+pymupdf
+streamlit
+google-genai
+anthropic
+openai
+pytest
