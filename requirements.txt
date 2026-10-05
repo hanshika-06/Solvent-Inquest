@@ -1,6 +1,7 @@
-pymupdf
-streamlit
-google-genai
-anthropic
-openai
-pytest
+pymupdf>=1.24.0
+streamlit>=1.35.0
+google-genai>=1.0.0
+anthropic>=0.30.0
+openai>=1.30.0
+python-dotenv>=1.0.0
+pytest>=8.0.0
